@@ -1,0 +1,80 @@
+<html>
+<head>
+    <title>Identificação</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.25/webcam.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function getLocation() {
+          if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+          } else {
+            $('#geolocation').html("Geolocatização não funcionada nesse navegador.");
+          }
+        }
+        function showPosition(position) {
+            window['latitude'] = position.coords.latitude;
+            window['longitude'] = position.coords.longitude;
+            $('#geolocation').html(
+                "<b>Latitude</b>: " + position.coords.latitude + "<b><br>Longitude</b>: " + position.coords.longitude
+            );
+        }
+    </script>
+    <style>
+        body{
+            margin:10px;
+        }
+    </style>
+</head>
+
+<body onload="getLocation();startScan()">
+    <div id="camera" style="position:absolute; top:10; right:10"></div>
+    <h1>Identificação</h1>
+    <h2>Facial</h2>
+    <div style="text-align:center">
+        <img src="https://cdn.dribbble.com/users/1332896/screenshots/3195603/scan.gif" style="max-width:90%; max-height:200px">
+    </div>
+    <h2>Geoespacial</h2>
+    <div style="text-align:center">
+        <img src="https://icon-library.com/images/position-icon/position-icon-8.jpg" style="width:100">
+        <p id="geolocation">Verificando geolocalização...</p>
+    </div>
+    <!--FOR THE SNAPSHOT
+    <input type="button" value="Take a Snap" id="btPic" onclick="takeSnapShot()" />
+    <p id="result"></p>
+    -->
+</body>
+
+<script>
+    function startScan(){
+        var interval;
+        Webcam.set({
+            width: 110,
+            height: 95,
+            image_format: 'jpeg',
+            jpeg_quality: 200
+        });
+        Webcam.attach('#camera');
+
+        takeSnapShot = function () {
+            Webcam.snap(function (data_uri) {
+                var data = {image:data_uri, latitude:window['latitude'], longitude:window['longitude']};
+                $.post("?", data, function( url ) {
+                    if(url){
+                        document.location.href = url;
+                        clearInterval(interval);
+                    }
+                });
+            });
+        }
+
+        Webcam.on( 'live', function() {
+            interval = setInterval(takeSnapShot, 5000);
+        } );
+
+        Webcam.on( 'error', function(err) {
+            if(interval) clearInterval(interval);
+        } );
+    }
+</script>
+</html>

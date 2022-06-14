@@ -1,0 +1,60 @@
+<html>
+<head>
+    <title>Start Check-in</title>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body{
+            margin:10px;
+        }
+    </style>
+</head>
+<body>
+<h1>QrCode</h1>
+<div id="message" class="alert alert-primary" role="alert">
+  <h4 class="alert-heading">Bem-vindo!</h4>
+    <p>Para incia o processo de <b>reconhecimento facial</b> e de <b>geolização</b>, é necessário que você se identifique.</p>
+  <hr>
+  <p class="mb-0">Por favor, clique no botão abaixo e posicione o seu QrCode na câmera.</p>
+</div>
+<div id="video-container" style="display:none; text-align:center;margin-top:200px">
+    <div>
+        <img style="max-height:250" src="https://cdn.dribbble.com/users/1046956/screenshots/4468756/qrscananimation.gif"/>
+    </div>
+    <div>
+        <video id="qr-video" disablepictureinpicture="" playsinline="" style="transform: scaleX(-1);width:50%;position:absolute; top:10; right:10"></video>
+    </div>
+</div>
+<div align="center">
+    <a class="btn btn-primary" onclick="startScan()" style="font-size:30" href="javascript:">Iniciar</a>
+</div>
+
+</body>
+<script type="module">
+import QrScanner from "/static/js/qr-scanner.min.js";
+const video = document.getElementById('qr-video');
+const videoContainer = document.getElementById('video-container');
+function startScan(){
+    $('#message').css('display', 'none');
+    $('#video-container').css('display', 'block');
+    scanner.start().then(() => {});
+    setTimeout(stopScan, 5000);
+}
+function stopScan(){
+    $('#video-container').css('display', 'none');
+    $('#message').css('display', 'block');
+    scanner.stop();
+}
+function setResult(result) {
+    stopScan();
+    document.location.href = result.data;
+}
+window['scanner'] = new QrScanner(video, result => setResult(result), {
+    onDecodeError: error => {},
+    highlightScanRegion: true,
+    highlightCodeOutline: true,
+});
+window['startScan'] = startScan;
+</script>
+
+</html>
