@@ -44,10 +44,10 @@
         <img src="https://icon-library.com/images/position-icon/position-icon-8.jpg" style="width:100">
         <p id="geolocation">Verificando geolocalização...</p>
     </div>
-    <!--FOR THE SNAPSHOT
-    <input type="button" value="Take a Snap" id="btPic" onclick="takeSnapShot()" />
-    <p id="result"></p>
-    -->
+
+    <a class="btn btn-primary" id="btPic" href="javascript:" onclick="takeSnapShot()">Tirar Foto</a>
+
+
 </body>
 
 <script>
@@ -74,7 +74,6 @@
         }
 
         Webcam.on( 'live', function() {
-            alert('OK');
             interval = setInterval(takeSnapShot, 5000);
         } );
 
