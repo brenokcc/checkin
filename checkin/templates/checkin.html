@@ -74,10 +74,12 @@
         }
 
         Webcam.on( 'live', function() {
+            alert('OK');
             interval = setInterval(takeSnapShot, 5000);
         } );
 
         Webcam.on( 'error', function(err) {
+            alert(err);
             if(interval) clearInterval(interval);
         } );
     }
