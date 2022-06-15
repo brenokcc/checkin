@@ -1,3 +1,6 @@
+import uuid
+import requests
+from django.core.files.base import ContentFile
 from sloth.db import models, meta
 
 
@@ -14,9 +17,17 @@ class Aplicacao(models.Model):
 
     objects = AplicacaoManager()
 
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = uuid.uuid1().hex
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Aplicação'
         verbose_name_plural = 'Aplicações'
+        fieldsets = {
+            'Dados Gerais': ('nome', 'redirect')
+        }
 
     def __str__(self):
         return self.nome
@@ -25,14 +36,19 @@ class Aplicacao(models.Model):
 
 class PessoaManager(models.Manager):
     def all(self):
-        return self.role_lookups('Usuário', aplicacao__usuario='user').display('get_foto', 'nome', 'chave', 'aplicacao')
+        return self.role_lookups('Usuário', aplicacao__usuario='user').display('get_foto', 'nome', 'chave', 'aplicacao').actions('SincronizarFoto')
+
+    def sincronizar_fotos(self, atualizar=False):
+        for pessoa in self.filter(foto__isnull=True).exclude(url__isnull=True):
+            pessoa.sincronizar_foto(atualizar=atualizar)
 
 
 class Pessoa(models.Model):
     aplicacao = models.ForeignKey(Aplicacao, verbose_name='Aplicação')
     nome = models.CharField(verbose_name='Nome')
     chave = models.CharField(verbose_name='Chave', help_text='Identificador da pessoa. Ex: E-mail, CPF, Matrícula.')
-    foto = models.ImageField(verbose_name='Foto', upload_to='pessoa')
+    foto = models.ImageField(verbose_name='Foto', upload_to='pessoa', null=True, blank=True)
+    url = models.URLField(verbose_name='URL da Foto', null=True, blank=True)
 
     objects = PessoaManager()
 
@@ -46,6 +62,12 @@ class Pessoa(models.Model):
     @meta('Foto', 'photo')
     def get_foto(self):
         return self.foto
+
+    def sincronizar_foto(self, atualizar=False):
+        if self.url and (atualizar or not self.foto):
+            nome_arquivo = self.url.split('/')[-1]
+            resposta = requests.get(self.url)
+            self.foto.save('{}{}'.format(self.id, nome_arquivo), ContentFile(resposta.content))
 
 
 class CheckinManager(models.Manager):
