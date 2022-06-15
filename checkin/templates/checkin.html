@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>Identificação</title>
+    <title>Identificação - {{ pessoa }}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -34,12 +34,12 @@
 
 <body onload="getLocation();startScan()">
     <div id="camera" style="position:absolute; top:10; right:10"></div>
-    <h1>Identificação</h1>
-    <h2>Facial</h2>
+    <h1>{{ pessoa }}</h1>
+    <h2>Identificação Facial</h2>
     <div style="text-align:center">
         <img src="https://cdn.dribbble.com/users/1332896/screenshots/3195603/scan.gif" style="max-width:90%; max-height:200px">
     </div>
-    <h2>Geoespacial</h2>
+    <h2>Identificação Geoespacial</h2>
     <div style="text-align:center">
         <img src="https://icon-library.com/images/position-icon/position-icon-8.jpg" style="width:100">
         <p id="geolocation">Verificando geolocalização...</p>
@@ -74,7 +74,10 @@
                     }
                 });
             });
-            if(interval && i > 5) clearInterval(interval);
+            if(interval && i > 3){
+                clearInterval(interval);
+                alert('Identificação facial não realizada!');
+            }
         }
 
         Webcam.on( 'live', function() {

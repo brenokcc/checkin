@@ -12,8 +12,8 @@ from .models import Checkin, Pessoa
 
 @csrf_exempt
 def checkin(request, token_aplicacao, chave_pessoa):
+    pessoa = Pessoa.objects.get(aplicacao__token=token_aplicacao, chave=chave_pessoa)
     if request.POST:
-        pessoa = Pessoa.objects.get(aplicacao__token=token_aplicacao, chave=chave_pessoa)
         file_path = tempfile.mktemp(suffix='.jpeg')
         file = open(file_path, 'wb')
         file.write(base64.b64decode(request.POST['image'][23:]))
@@ -33,7 +33,7 @@ def checkin(request, token_aplicacao, chave_pessoa):
                 )
                 return HttpResponse('/end/{}/'.format(checkin.uuid))
         return HttpResponse('')
-    return render(request, 'checkin.html')
+    return render(request, 'checkin.html', dict(pessoa=pessoa))
 
 
 def start(request):
