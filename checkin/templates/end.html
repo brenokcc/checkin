@@ -27,7 +27,7 @@
             Redirecionando para a aplicação {{ checkin.pessoa.aplicacao }} em
             <span id="segundos" style="font-weight:bold">10 segundos</span>
         </p>
-        <a class="btn btn-primary" onclick="startScan()" style="font-size:20" href="javascript:">Redirecionar</a>
+        <a class="btn btn-primary" href="{{ checkin.pessoa.aplicacao.redirect }}" style="font-size:20">Redirecionar</a>
     </div>
     <script>
         var count = 10;
