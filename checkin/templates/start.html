@@ -42,6 +42,7 @@ const videoContainer = document.getElementById('video-container');
 function startScan(){
     $('#message').css('display', 'none');
     $('#video-container').css('display', 'block');
+    scanner.setCamera('user');
     scanner.start().then(() => {});
     setTimeout(stopScan, 5000);
 }
