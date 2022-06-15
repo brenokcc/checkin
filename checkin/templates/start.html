@@ -44,7 +44,7 @@ function startScan(){
     $('#video-container').css('display', 'block');
     scanner.setCamera('user');
     scanner.start().then(() => {});
-    setTimeout(stopScan, 5000);
+    setTimeout(stopScan, 10000);
 }
 function stopScan(){
     $('#video-container').css('display', 'none');
