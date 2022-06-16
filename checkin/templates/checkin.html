@@ -32,9 +32,14 @@
     </style>
 </head>
 
-<body onload="getLocation();startScan()">
+<body onload="getLocation();{% if autorizado %}startScan(){% endif %}">
     <div id="camera" style="position:absolute; top:10; right:10"></div>
     <h1>{{ pessoa }}</h1>
+    {% if not autorizado %}
+        <div id="message" class="alert alert-danger" role="alert">
+          Dispositivo não autorizado. Não será possível realizar a identificação facial.
+        </div>
+    {% endif %}
     <h2>Identificação Facial</h2>
     <div style="text-align:center">
         <img src="https://cdn.dribbble.com/users/1332896/screenshots/3195603/scan.gif" style="max-width:90%; max-height:200px">
@@ -44,11 +49,6 @@
         <img src="https://icon-library.com/images/position-icon/position-icon-8.jpg" style="width:100">
         <p id="geolocation">Verificando geolocalização...</p>
     </div>
-
-    <!--
-    <a class="btn btn-primary" id="btPic" href="javascript:" onclick="takeSnapShot()">Tirar Foto</a>
-    -->
-
 </body>
 
 <script>

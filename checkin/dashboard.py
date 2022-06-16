@@ -1,8 +1,7 @@
 from sloth.app.dashboard import Dashboard
-from .models import *
+from .models import Aplicacao, Pessoa
 
 class AppDashboard(Dashboard):
     
     def load(self, request):
-        pass
-
+        self.shortcuts(Aplicacao, Pessoa)

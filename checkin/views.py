@@ -1,5 +1,6 @@
-from uuid import uuid1
+import re
 import base64
+from uuid import uuid1
 import tempfile
 import datetime
 from django.http import HttpResponse
@@ -9,10 +10,29 @@ import face_recognition
 from .models import Checkin, Pessoa
 
 
+def get_device_id(request):
+    user_agent = request.headers['User-Agent']
+    x = re.sub(r'\d|\(|\)', '.', user_agent)
+    return base64.b64encode(x.encode()).decode()
+
+
+def check_device_id(device_id, request):
+    user_agent = request.headers['User-Agent']
+    x = base64.b64decode(device_id.encode()).decode()
+    return bool(re.search(x, user_agent))
+
 
 @csrf_exempt
-def checkin(request, token_aplicacao, chave_pessoa):
-    pessoa = Pessoa.objects.get(aplicacao__token=token_aplicacao, chave=chave_pessoa)
+def checkin(request, token, chave_pessoa=None):
+    if chave_pessoa is None:
+        pessoa = Pessoa.objects.get(token=token)
+        if pessoa.dispositivo is None:
+            pessoa.dispositivo = get_device_id(request)
+            pessoa.save()
+        autorizado = check_device_id(pessoa.dispositivo, request)
+    else:
+        autorizado = True
+        pessoa = Pessoa.objects.get(aplicacao__token=token, chave=chave_pessoa)
     if request.POST:
         file_path = tempfile.mktemp(suffix='.jpeg')
         file = open(file_path, 'wb')
@@ -33,10 +53,11 @@ def checkin(request, token_aplicacao, chave_pessoa):
                 )
                 return HttpResponse('/end/{}/'.format(checkin.uuid))
         return HttpResponse('')
-    return render(request, 'checkin.html', dict(pessoa=pessoa))
+    return render(request, 'checkin.html', dict(pessoa=pessoa, autorizado=autorizado))
 
 
 def start(request):
+    print(request.headers['User-Agent'])
     return render(request, 'start.html')
 
 
