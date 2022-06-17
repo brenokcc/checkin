@@ -23,6 +23,7 @@ class Aplicacao(models.Model):
         super().save(*args, **kwargs)
 
     class Meta:
+        icon = 'fullscreen'
         verbose_name = 'Aplicação'
         verbose_name_plural = 'Aplicações'
         fieldsets = {
@@ -58,6 +59,7 @@ class Pessoa(models.Model):
     objects = PessoaManager()
 
     class Meta:
+        icon = 'people'
         verbose_name = 'Pessoa'
         verbose_name_plural = 'Pessoas'
         fieldsets = {
@@ -101,14 +103,22 @@ class Checkin(models.Model):
     pessoa = models.ForeignKey(Pessoa, verbose_name='Pessoa')
     data_hora = models.DateField(verbose_name='Data/Hora', auto_created=True)
     latitude = models.CharField(verbose_name='Latitude')
-    longitude = models.CharField(verbose_name='Latitude')
+    longitude = models.CharField(verbose_name='Longitude')
     imagem = models.ImageField(verbose_name='Imagem', upload_to='checkin', null=True)
 
     objects = CheckinManager()
 
     class Meta:
+        icon = 'pin-map'
         verbose_name = 'Checkin'
         verbose_name_plural = 'Checkin'
 
     def __str__(self):
         return 'Checkin {}'.format(self.pk)
+
+    @meta('Localização', 'geolocation')
+    def get_localizacao(self):
+        return self.latitude, self.longitude
+
+    def view(self):
+        return self.values('uuid', ('pessoa', 'data_hora'), ('latitude', 'longitude'), 'get_localizacao')

@@ -6,9 +6,12 @@ import datetime
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-import face_recognition
 from .models import Checkin, Pessoa
 
+try:
+    import face_recognition
+except ImportError:
+    pass
 
 def get_device_id(request):
     user_agent = request.headers['User-Agent']

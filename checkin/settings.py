@@ -141,24 +141,24 @@ OAUTH2_PROVIDER = {
 }
 
 SLOTH = {
-	'NAME': 'Sloth',
+	'NAME': 'Check-in',
 	'ICON': '/static/images/icon.png',
 	'FAVICON': '/static/images/icon.png',
 	'VERSION': 1.0,
 	'LOGIN': {
-		'LOGO': '/static/images/logo.png',
-		'TITLE': None,
+		'LOGO': '/static/images/checkin.png',
+		'TITLE': 'Check-in',
 		'TEXT': None,
-		'IMAGE': '/static/images/login.jpeg',
+		'IMAGE': None,
 		'USERNAME_MASK': None
 	},
 	'HEADER': {
-		'LOGO': '/static/images/logo.png',
-		'TITLE': None,
+		'LOGO': '/static/images/checkin.png',
+		'TITLE': 'Check-in',
 		'TEXT': None,
 	},
 	'FOOTER': {
-		'TITLE': '© 2022 Sloth',
+		'TITLE': '© 2022 Checkin - Reconhecimento facil e geolocalização',
 		'TEXT': 'Todos os direitos reservados',
 		'LINKS': [],
 	},
