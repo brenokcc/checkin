@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -25,8 +24,9 @@ SECRET_KEY = 'django-insecure-nbdx_bj28xsm!*^gbs5+!o(^*(!s*n!nmnoj$cely4hv1!3nh-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+SITE_URL = 'https://192168019.aplicativo.click'
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://d10wqeav51zlj6.cloudfront.net']
+CSRF_TRUSTED_ORIGINS = ['https://d10wqeav51zlj6.cloudfront.net', SITE_URL]
 
 
 # Application definition
@@ -142,8 +142,8 @@ OAUTH2_PROVIDER = {
 
 SLOTH = {
 	'NAME': 'Check-in',
-	'ICON': '/static/images/icon.png',
-	'FAVICON': '/static/images/icon.png',
+	'ICON': '/static/images/checkin.png',
+	'FAVICON': '/static/images/pin.png',
 	'VERSION': 1.0,
 	'LOGIN': {
 		'LOGO': '/static/images/checkin.png',

@@ -1,18 +1,7 @@
 <html>
 <head>
-    <title>Start Check-in</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body{
-            margin:10px;
-        }
-    </style>
+    <title>Iniciar Check-in</title>
+    {% include "head.html" %}
 </head>
 <body>
     <h1>{{ checkin.pessoa }}</h1>
@@ -24,20 +13,20 @@
     </div>
     <div align="center">
         <p>
-            Redirecionando para a aplicação {{ checkin.pessoa.aplicacao }} em
-            <span id="segundos" style="font-weight:bold">10 segundos</span>
+            Redirecionando em
+            <span id="segundos" style="font-weight:bold">5 segundos</span>
         </p>
-        <a class="btn btn-primary" href="{{ checkin.pessoa.aplicacao.redirect }}" style="font-size:20">Redirecionar</a>
+        <a class="btn btn-primary" href="{{ request.GET.next }}" style="font-size:20">Redirecionar</a>
     </div>
     <script>
-        var count = 10;
+        var count = 5;
         function redirect(){
             if(count>0){
                 $('#segundos').html(count+' segundos')
                 setTimeout(redirect, 1000);
                 count-=1;
             } else {
-                document.location.href = '{{ checkin.pessoa.aplicacao.redirect }}';
+                document.location.href = '{{ request.GET.next }}';
             }
         }
         redirect();

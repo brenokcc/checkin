@@ -1,0 +1,32 @@
+<html>
+<head>
+    <title>{{ pessoa }}</title>
+    {% include "head.html" %}
+</head>
+<body>
+    <h1 align="center">{{ pessoa }}</h1>
+    <div align="center">
+        <img src="/media/{{ pessoa.foto }}" width="80"/>
+        <p>
+            {{ pessoa.chave }}
+        </p>
+    </div>
+    <div align="center" id="qrcode" style="margin:20"></div>
+    <div align="center">
+        <a class="btn btn-success" href="/checkin/{{ pessoa.token }}/">
+            Registrar Presença
+        </a>
+    </div>
+    <div class="center" style="max-width:400px;margin:auto">
+        {% for checkin in pessoa.get_ultimos_checkins %}
+            <span class="badge bg-primary" style="padding:10px;margin: 5px;font-size:0.6rem">
+                {{ checkin.data_hora }}
+            </span>
+        {% endfor %}
+    </div>
+</body>
+<script src="/static/js/qrcode.min.js"></script>
+<script type="text/javascript">
+    new QRCode(document.getElementById("qrcode"), "{{ pessoa.token }}");
+</script>
+</html>

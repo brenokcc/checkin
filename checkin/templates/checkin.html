@@ -1,45 +1,13 @@
 <html>
 <head>
     <title>Identificação - {{ pessoa }}</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    {% include "head.html" %}
     <script type="text/javascript" src="/static/js/webcam.min.js"></script>
-	<script src="/static/js/jquery-3.6.0.min.js"></script>
-    <script>
-        function getLocation() {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showPosition);
-          } else {
-            $('#geolocation').html("Geolocatização não funcionada nesse navegador.");
-          }
-        }
-        function showPosition(position) {
-            window['latitude'] = position.coords.latitude;
-            window['longitude'] = position.coords.longitude;
-            $('#geolocation').html(
-                "<b>Latitude</b>: " + position.coords.latitude + "<b><br>Longitude</b>: " + position.coords.longitude
-            );
-        }
-    </script>
-    <style>
-        body{
-            margin:10px;
-        }
-    </style>
 </head>
 
-<body onload="getLocation();{% if autorizado %}startScan(){% endif %}">
+<body>
     <div id="camera" style="position:absolute; top:10; right:10"></div>
     <h1>{{ pessoa }}</h1>
-    {% if not autorizado %}
-        <div id="message" class="alert alert-danger" role="alert">
-          Dispositivo não autorizado. Não será possível realizar a identificação facial.
-        </div>
-    {% endif %}
     <h2>Identificação Facial</h2>
     <div style="text-align:center">
         <img src="https://cdn.dribbble.com/users/1332896/screenshots/3195603/scan.gif" style="max-width:90%; max-height:200px">
@@ -50,8 +18,22 @@
         <p id="geolocation">Verificando geolocalização...</p>
     </div>
 </body>
-
 <script>
+{% if autorizado %}
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        $('#geolocation').html("Geolocatização não funcionada nesse navegador.");
+      }
+    }
+    function showPosition(position) {
+        window['latitude'] = position.coords.latitude;
+        window['longitude'] = position.coords.longitude;
+        $('#geolocation').html(
+            "<b>Latitude</b>: " + position.coords.latitude + "<b><br>Longitude</b>: " + position.coords.longitude
+        );
+    }
     function startScan(){
         var i = 0;
         var interval;
@@ -67,17 +49,20 @@
             i += 1;
             Webcam.snap(function (data_uri) {
                 var data = {image:data_uri, latitude:window['latitude'], longitude:window['longitude']};
-                $.post("?", data, function( url ) {
-                    if(url){
-                        document.location.href = url;
+                $.post("?", data, function( data ) {
+                    var response = JSON.parse(data);
+                    if(response.uuid){
+                        document.location.href = '/end/' + response.uuid + '/?next={{ redirect_url }}';
                         clearInterval(interval);
+                    } else {
+                        if(interval && i > 3){
+                            clearInterval(interval);
+                            alert(response.message);
+                            history.back();
+                        }
                     }
                 });
             });
-            if(interval && i > 3){
-                clearInterval(interval);
-                alert('Identificação facial não realizada!');
-            }
         }
 
         Webcam.on( 'live', function() {
@@ -89,5 +74,11 @@
             if(interval) clearInterval(interval);
         } );
     }
+    getLocation();
+    startScan();
+{% else %}
+    alert('Dispositivo não autorizado.');
+    history.back();
+{% endif %}
 </script>
 </html>

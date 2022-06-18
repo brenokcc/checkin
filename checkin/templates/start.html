@@ -1,21 +1,14 @@
 <html>
 <head>
-    <title>Start Check-in</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="minimal-ui, width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
-    <meta name="apple-mobile-web-app-capable" content="yes"/>
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <style>
-        body{
-            margin:10px;
-        }
-    </style>
+    <title>{{ ponto_checkin.nome }}</title>
+    {% include "head.html" %}
 </head>
 <body>
-<img src="https://suap.ifrn.edu.br/static/comum/img/logo.png" style="max-width:200px"/>
+{% if ponto_checkin.logo %}
+    <img src="/media/{{ ponto_checkin.logo }}" style="max-width:200px"/>
+{% else %}
+    <h1>{{ ponto_checkin.nome }}</h1>
+{% endif %}
 <div id="message" class="alert alert-primary" role="alert">
   <h4 class="alert-heading">Bem-vindo!</h4>
     <p>Para inciar o processo de <b>reconhecimento facial</b> e de <b>geolização</b>, é necessário que você se identifique.</p>
@@ -36,31 +29,30 @@
 
 </body>
 <script type="module">
-import QrScanner from "/static/js/qr-scanner.min.js";
-const video = document.getElementById('qr-video');
-const videoContainer = document.getElementById('video-container');
-function startScan(){
-    $('#message').css('display', 'none');
-    $('#video-container').css('display', 'block');
-    scanner.setCamera('user');
-    scanner.start().then(() => {});
-    setTimeout(stopScan, 10000);
-}
-function stopScan(){
-    $('#video-container').css('display', 'none');
-    $('#message').css('display', 'block');
-    scanner.stop();
-}
-function setResult(result) {
-    stopScan();
-    document.location.href = result.data;
-}
-window['scanner'] = new QrScanner(video, result => setResult(result), {
-    onDecodeError: error => {},
-    highlightScanRegion: true,
-    highlightCodeOutline: true,
-});
-window['startScan'] = startScan;
+    import QrScanner from "/static/js/qr-scanner.min.js";
+    const video = document.getElementById('qr-video');
+    const videoContainer = document.getElementById('video-container');
+    function startScan(){
+        $('#message').css('display', 'none');
+        $('#video-container').css('display', 'block');
+        scanner.setCamera('user');
+        scanner.start().then(() => {});
+        setTimeout(stopScan, 10000);
+    }
+    function stopScan(){
+        $('#video-container').css('display', 'none');
+        $('#message').css('display', 'block');
+        scanner.stop();
+    }
+    function setResult(result) {
+        stopScan();
+        document.location.href = '/checkin/{{ ponto_checkin.token }}/' + result.data + '/';
+    }
+    window['scanner'] = new QrScanner(video, result => setResult(result), {
+        onDecodeError: error => {},
+        highlightScanRegion: true,
+        highlightCodeOutline: true,
+    });
+    window['startScan'] = startScan;
 </script>
-
 </html>
