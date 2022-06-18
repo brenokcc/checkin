@@ -24,10 +24,10 @@ SECRET_KEY = 'django-insecure-nbdx_bj28xsm!*^gbs5+!o(^*(!s*n!nmnoj$cely4hv1!3nh-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-SITE_URL = 'https://192168019.aplicativo.click'
-ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://d10wqeav51zlj6.cloudfront.net', SITE_URL]
 
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://d10wqeav51zlj6.cloudfront.net', 'https://192168019.aplicativo.click']
+SITE_URL = CSRF_TRUSTED_ORIGINS[0]
 
 # Application definition
 
