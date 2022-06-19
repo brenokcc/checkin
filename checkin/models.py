@@ -234,7 +234,8 @@ class Pessoa(models.Model):
         return self.checkin_set.order_by('-id')[0:5]
 
     def comparar(self, imagem_base64):
-        return True
+        if settings.LOCAL:
+            return True
         file_path = tempfile.mktemp(suffix='.jpeg')
         file = open(file_path, 'wb')
         file.write(base64.b64decode(imagem_base64))

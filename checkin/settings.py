@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -24,10 +24,10 @@ SECRET_KEY = 'django-insecure-nbdx_bj28xsm!*^gbs5+!o(^*(!s*n!nmnoj$cely4hv1!3nh-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
+LOCAL = os.path.exists('/Users/breno/')
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://d10wqeav51zlj6.cloudfront.net', 'https://192168019.aplicativo.click']
-SITE_URL = CSRF_TRUSTED_ORIGINS[1]
+SITE_URL = CSRF_TRUSTED_ORIGINS[1 if LOCAL else 0]
 
 # Application definition
 
