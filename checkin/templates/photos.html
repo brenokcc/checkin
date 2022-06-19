@@ -17,29 +17,33 @@
         <p>Placa Traseira</p>
     </div>
 <script>
-    var i = 0;
-    var interval;
     Webcam.set({
         width: 110,
         height: 95,
         image_format: 'jpeg',
-        jpeg_quality: 200
+        jpeg_quality: 400
+    });
+    Webcam.set('constraints',{
+        facingMode: "environment"
     });
     Webcam.attach('#camera');
 
     takeSnapShot = function (img) {
+        var shutter = new Audio();
+        shutter.autoplay = true;
+        shutter.src = navigator.userAgent.match(/Firefox/) ? '/static/audio/shutter.ogg' : 'shutter.mp3';
         Webcam.snap(function (data_uri) {
             img.src = data_uri;
+            shutter.play();
         });
     }
 
     Webcam.on( 'live', function() {
-        interval = setInterval(takeSnapShot, 5000);
+
     } );
 
     Webcam.on( 'error', function(err) {
         alert(err);
-        if(interval) clearInterval(interval);
     } );
 </script>
 </body>
