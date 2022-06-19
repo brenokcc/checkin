@@ -261,7 +261,7 @@ class Pessoa(models.Model):
                 )
                 return obj
             raise ValidationError('Ponto de checkin inválido.')
-        raise ValidationError('Identificação facial não realizada.')
+        raise ValidationError('Reconhecimento facial não realizado.')
 
     def checar_dispositivo(self, request):
         user_agent = request.headers['User-Agent']
