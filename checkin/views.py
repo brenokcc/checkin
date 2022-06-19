@@ -91,3 +91,7 @@ def end(request, uuid):
     if 'ponto' in request.GET and request.GET['ponto']:
         redirect_url = '/start/'
     return render(request, 'end.html', dict(checkin=checkin))
+
+
+def photos(request):
+    return render(request, 'photos.html', dict())
