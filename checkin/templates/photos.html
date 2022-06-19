@@ -9,22 +9,22 @@
     <div id="camera" style="position:fixed; top:10; right:10"></div>
     <h1>Solicitação</h1>
     <div align="center">
-        <img width="50%" id="img" src="/static/images/no-image.png" onclick="takeSnapShot(this)">
+        <img width="50%" src="/static/images/no-image.png" onclick="takeSnapShot(this)">
         <p>Placa Dianteira</p>
     </div>
     <div align="center">
-        <img width="50%" id="img" src="/static/images/no-image.png" onclick="takeSnapShot(this)">
+        <img width="50%" src="/static/images/no-image.png" onclick="takeSnapShot(this)">
         <p>Placa Traseira</p>
     </div>
 <script>
     Webcam.set({
-        width: 110,
-        height: 95,
+        width: 250,
+        height: 200,
         image_format: 'jpeg',
-        jpeg_quality: 400
-    });
-    Webcam.set('constraints',{
-        facingMode: "environment"
+        jpeg_quality: 100,
+        constraints:{
+            facingMode: "environment",
+        }
     });
     Webcam.attach('#camera');
 
