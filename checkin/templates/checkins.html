@@ -12,18 +12,37 @@
         </p>
     </div>
     <div align="center" id="qrcode" style="margin:20"></div>
+
+    {% with solicitacoes_pendentes=pessoa.get_solicitacoes.pendentes %}
+        {% if solicitacoes_pendentes %}
+            <h3 align="center">Solicitações Pendentes</h3>
+            <div class="center" style="max-width:400px;margin:auto">
+                {% for solicitacao in solicitacoes_pendentes %}
+                    <p align="center">
+                        <a class="btn btn-primary" href="/checkin/solicitacao/{{ solicitacao.uuid }}/">{{ solicitacao }}</a>
+                    </p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% with ultimos_checkins=pessoa.get_ultimos_checkins %}
+        {% if ultimos_checkins %}
+            <h3 align="center">Últimos Registros</h3>
+            <div align="center">
+                {% for checkin in ultimos_checkins %}
+                <p>{{ checkin.data_hora }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
     <div align="center">
-        <a class="btn btn-success" href="/checkin/{{ pessoa.token }}/">
+        <a class="btn btn-success" href="/checkin/pessoa/{{ pessoa.token }}/">
             Registrar Presença
         </a>
     </div>
-    <div class="center" style="max-width:400px;margin:auto">
-        {% for checkin in pessoa.get_ultimos_checkins %}
-            <span class="badge bg-primary" style="padding:10px;margin: 5px;font-size:0.6rem">
-                {{ checkin.data_hora }}
-            </span>
-        {% endfor %}
-    </div>
+
 </body>
 <script src="/static/js/qrcode.min.js"></script>
 <script type="text/javascript">

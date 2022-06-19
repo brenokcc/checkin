@@ -1,13 +1,13 @@
 <html>
 <head>
-    <title>{{ ponto_checkin.nome }}</title>
+    <title>{{ ponto.nome }}</title>
     {% include "head.html" %}
 </head>
 <body>
-{% if ponto_checkin.logo %}
-    <img src="/media/{{ ponto_checkin.logo }}" style="max-width:200px"/>
+{% if ponto.logo %}
+    <img src="/media/{{ ponto.logo }}" style="max-width:200px"/>
 {% else %}
-    <h1>{{ ponto_checkin.nome }}</h1>
+    <h1>{{ ponto.nome }}</h1>
 {% endif %}
 <div id="message" class="alert alert-primary" role="alert">
   <h4 class="alert-heading">Bem-vindo!</h4>
@@ -46,7 +46,7 @@
     }
     function setResult(result) {
         stopScan();
-        document.location.href = '/checkin/{{ ponto_checkin.token }}/' + result.data + '/';
+        document.location.href = '/checkin/ponto/{{ ponto.token }}/' + result.data + '/';
     }
     window['scanner'] = new QrScanner(video, result => setResult(result), {
         onDecodeError: error => {},

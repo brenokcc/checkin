@@ -51,8 +51,11 @@
                 var data = {image:data_uri, latitude:window['latitude'], longitude:window['longitude']};
                 $.post("?", data, function( data ) {
                     var response = JSON.parse(data);
-                    if(response.uuid){
-                        document.location.href = '/end/' + response.uuid + '/?next={{ redirect_url }}';
+                    if(response.checkin){
+                        document.location.href = '/end/' + response.checkin + '/?next={{ redirect_url }}';
+                        clearInterval(interval);
+                    } else if(response.solicitacao){
+                        document.location.href = '/upload/' + response.solicitacao + '/';
                         clearInterval(interval);
                     } else {
                         if(interval && i > 3){

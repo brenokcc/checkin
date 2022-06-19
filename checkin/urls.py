@@ -3,11 +3,11 @@ from . import views
 
 urlpatterns = [
     path('start/<str:token>/', views.start),
-    path('checkins/<str:token>/', views.checkins),
-    path('checkin/<str:token>/<str:token_pessoa>/', views.checkin),
-    path('checkin/<str:token>/', views.checkin),
+    path('profile/<str:token>/', views.profile),
+    path('checkin/<str:tipo>/<str:token>/<str:token2>/', views.checkin),
+    path('checkin/<str:tipo>/<str:token>/', views.checkin),
     path('end/<str:uuid>/', views.end),
-    path('photos/', views.photos),
+    path('upload/<str:uuid>/', views.upload),
     path('', include('sloth.api.urls')),
     path('', include('sloth.app.urls')),
 ]

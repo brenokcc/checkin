@@ -1,0 +1,77 @@
+<html>
+<head>
+    <title>Solicitação</title>
+    {% include "head.html" %}
+    <script type="text/javascript" src="/static/js/webcam.min.js"></script>
+</head>
+
+<body>
+    <div id="camera" style="position:fixed; top:10; right:10"></div>
+    <h1>{{ solicitacao }}</h1>
+    {% for descricao in solicitacao.get_descricoes_imagens %}
+    <div align="center">
+        <img id="{{ descricao|slugify }}" width="50%" src="/static/images/no-image.png" onclick="takeSnapShot(this)">
+        <p>{{ descricao }}</p>
+    </div>
+    {% endfor %}
+    <div align="center">
+        <a id="btn" class="btn btn-primary disabled" href="javascript:uploadImages()">Enviar Imagens</a>
+    </div>
+<script>
+    Webcam.set({
+        width: 125,
+        height: 100,
+        image_format: 'jpeg',
+        jpeg_quality: 100,
+        constraints:{
+            facingMode: "environment",
+        }
+    });
+    Webcam.attach('#camera');
+
+    takeSnapShot = function (img) {
+        var shutter = new Audio();
+        shutter.autoplay = true;
+        shutter.src = navigator.userAgent.match(/Firefox/) ? '/static/audio/shutter.ogg' : 'shutter.mp3';
+        Webcam.snap(function (data_uri) {
+            img.src = data_uri;
+            shutter.play();
+            checarBotao();
+        });
+    }
+
+    Webcam.on( 'live', function() {
+
+    } );
+
+    Webcam.on( 'error', function(err) {
+        alert(err);
+    } );
+
+    function uploadImages(){
+        var data = {};
+        {% for descricao in solicitacao.get_descricoes_imagens %}
+            data['{{ descricao }}'] = $('#{{ descricao|slugify }}').attr('src');
+        {% endfor %}
+        $.post("?", data, function( data ) {
+            if(data==''){
+                alert('Imagens enviadas com sucesso.');
+                document.location.href = '/profile/{{ solicitacao.pessoa.token }}/';
+            } else {
+                alert(data);
+            }
+        });
+    }
+
+    function checarBotao(){
+        $('#btn').removeClass('disabled');
+        {% for descricao in solicitacao.get_descricoes_imagens %}
+            if(!$('#{{ descricao|slugify }}').attr('src').startsWith('data:image')){
+                $('#btn').addClass('disabled');
+            }
+        {% endfor %}
+    }
+
+</script>
+</body>
+</html>

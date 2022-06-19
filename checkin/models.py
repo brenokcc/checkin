@@ -1,9 +1,19 @@
+import re
 import uuid
+import json
+import datetime
 import requests
 import geopy.distance
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from sloth.db import models, meta
+import tempfile
+import base64
+try:
+    import face_recognition
+except ImportError:
+    pass
 
 
 class AplicacaoManager(models.Manager):
@@ -202,7 +212,7 @@ class Pessoa(models.Model):
 
     @meta('URL', 'url')
     def get_url(self):
-        return '{}/checkins/{}/'.format(settings.SITE_URL, self.token)
+        return '{}/profile/{}/'.format(settings.SITE_URL, self.token)
 
     @meta('QrCode da URL', 'qrcode')
     def get_qrcode_url(self):
@@ -211,13 +221,56 @@ class Pessoa(models.Model):
     def get_dados_checkin(self):
         return self.values('token', 'get_qrcode_token', 'get_url', 'get_qrcode_url')
 
-    def view(self):
-        return self.values('get_dados_gerais', 'get_dados_checkin').actions('ResetarDispositvo')
+    def get_dados_dispositivo(self):
+        return self.values('dispositivo').actions('ResetarDispositvo')
 
+    def view(self):
+        return self.values('get_dados_gerais', 'get_dados_checkin', 'get_dados_dispositivo', 'get_solicitacoes')
+
+    def get_solicitacoes(self):
+        return self.solicitacao_set.all().ignore('pessoa')
 
     def get_ultimos_checkins(self):
         return self.checkin_set.order_by('-id')[0:5]
 
+    def comparar(self, imagem_base64):
+        return True
+        file_path = tempfile.mktemp(suffix='.jpeg')
+        file = open(file_path, 'wb')
+        file.write(base64.b64decode(imagem_base64))
+        file.close()
+        if1 = face_recognition.load_image_file(file_path)
+        if2 = face_recognition.load_image_file(self.foto.path)
+        fe1 = face_recognition.face_encodings(if1)
+        fe2 = face_recognition.face_encodings(if2)
+        if fe1 and fe2:
+            result = face_recognition.compare_faces([fe1[0]], fe2[0])
+            if result[0]:
+                return True
+        return False
+
+    def checkin(self, latitude, longitude, imagem_base64, ponto=None):
+        if self.comparar(imagem_base64):
+            if ponto is None:
+                ponto = self.aplicacao.localizar_ponto_mais_proximo(latitude, longitude)
+            if ponto:
+                obj = Checkin.objects.create(
+                    uuid=uuid.uuid1().hex, pessoa=self, latitude=latitude, ponto=ponto,
+                    longitude=longitude, data_hora=datetime.datetime.now()
+                )
+                return obj
+            raise ValidationError('Ponto de checkin inválido.')
+        raise ValidationError('Identificação facial não realizada.')
+
+    def checar_dispositivo(self, request):
+        user_agent = request.headers['User-Agent']
+        if self.dispositivo is None and 'whatsapp' not in user_agent.lower():
+            self.dispositivo = base64.b64encode(re.sub(r'\d|\(|\)', '.', user_agent).encode()).decode()
+            self.save()
+        if self.dispositivo:
+            x = base64.b64decode(self.dispositivo.encode()).decode()
+            return bool(re.search(x, user_agent))
+        return True
 
 class CheckinManager(models.Manager):
     def all(self):
@@ -256,3 +309,65 @@ class Checkin(models.Model):
 
     def view(self):
         return self.values('uuid', ('pessoa', 'data_hora'), ('latitude', 'longitude'), 'get_localizacao', ('ponto', 'get_distancia_ponto'))
+
+
+class SolicitacaoManager(models.Manager):
+    def all(self):
+        return self.display('uuid', 'pessoa', 'descricao')
+
+    def pendentes(self):
+        return self.filter(data_hora_termino__isnull=True)
+
+
+class Solicitacao(models.Model):
+    uuid = models.CharField(verbose_name='UUID')
+    pessoa = models.ForeignKey(Pessoa, verbose_name='Pessoa')
+    descricao = models.CharField(verbose_name='Descrição')
+    latitude = models.CharField(verbose_name='Latitude', null=True, blank=True)
+    longitude = models.CharField(verbose_name='Longitude', null=True, blank=True)
+    data_hora_inicio = models.DateTimeField(verbose_name='Data/Hora de Início', null=True, blank=True)
+    data_hora_termino = models.DateTimeField(verbose_name='Data/Hora de Término', null=True, blank=True)
+    imagens = models.TextField(verbose_name='Imagens', blank=True, default='{}')
+
+    objects = SolicitacaoManager()
+
+    class Meta:
+        verbose_name = 'Solicitação'
+        verbose_name_plural = 'Solicitações'
+        fieldsets = {
+            'Dados Gerais': ('pessoa', 'descricao'),
+            'Imagens': ('imagens',)
+        }
+
+    def __str__(self):
+        return self.descricao
+
+    def save(self, *args, **kwargs):
+        if not self.uuid:
+            self.uuid = uuid.uuid1().hex
+        super().save(*args, **kwargs)
+
+    def salvar_imagens(self, dados):
+        imagens = json.loads(self.imagens)
+        for descricao in imagens:
+            imagens[descricao] = dados[descricao][23:]
+        self.imagens = json.dumps(imagens)
+        self.data_hora_termino = datetime.datetime.now()
+        self.save()
+
+    def get_descricoes_imagens(self):
+        return json.loads(self.imagens).keys()
+
+    def reiniciar(self):
+        self.data_hora_inicio = None
+        self.data_hora_termino = None
+        self.save()
+
+    def get_dados_gerais(self):
+        return self.values('uuid', 'pessoa', ('latitude', 'longitude'), ('data_hora_inicio', 'data_hora_termino'))
+
+    def get_dados_imagens(self):
+        return self.values('imagens')
+
+    def view(self):
+        return self.values('get_dados_gerais', 'get_dados_imagens').actions('ReiniciarSolicitacao')

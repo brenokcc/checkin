@@ -23,3 +23,15 @@ class ResetarDispositvo(actions.Action):
     def submit(self):
         self.instance.resetar_dispositivo()
         super().submit()
+
+
+class ReiniciarSolicitacao(actions.Action):
+    class Meta:
+        icon = 'reload'
+        verbose_name = 'Reiniciar Solicitação'
+        modal = True
+        style = 'warning'
+
+    def submit(self):
+        self.instance.reiniciar()
+        super().submit()

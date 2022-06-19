@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://d10wqeav51zlj6.cloudfront.net', 'https://192168019.aplicativo.click']
-SITE_URL = CSRF_TRUSTED_ORIGINS[0]
+SITE_URL = CSRF_TRUSTED_ORIGINS[1]
 
 # Application definition
 
