@@ -20,6 +20,8 @@
 </body>
 <script>
 {% if autorizado %}
+    window['latitude'] = 0;
+    window['longitude'] = 0;
     function getLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
