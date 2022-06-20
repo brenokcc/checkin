@@ -237,6 +237,7 @@ class Pessoa(models.Model):
         if settings.LOCAL:
             return True
         file_path = tempfile.mktemp(suffix='.jpeg')
+        print(file_path)
         file = open(file_path, 'wb')
         file.write(base64.b64decode(imagem_base64))
         file.close()
