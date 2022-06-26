@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from .models import Checkin, Pessoa, PontoCheckin, Solicitacao
+from .models import Checkin, Pessoa, PontoCheckin, Solicitacao, Aplicacao
 
 
 def profile(request, token):
@@ -64,5 +64,26 @@ def upload(request, uuid):
     solicitacao = Solicitacao.objects.get(uuid=uuid)
     if request.POST:
         solicitacao.salvar_imagens(request.POST)
-        return HttpResponse('')
+        sucesso, mensagem = solicitacao.enviar_dados()
+        if sucesso:
+            solicitacao.save()
+        return HttpResponse(mensagem)
     return render(request, 'upload.html', dict(solicitacao=solicitacao))
+
+
+@csrf_exempt
+def solicitar(request):
+    token = request.POST['token']
+    chave = request.POST['chave']
+    descricao = request.POST['descricao']
+    latitude = request.POST['latitude']
+    longitude = request.POST['longitude']
+    imagens = {x: '' for x in request.POST['imagens'].split('|')}
+    aplicacao = Aplicacao.objects.get(token_autenticacao=token)
+    pessoa = Pessoa.objects.get(aplicacao=aplicacao, chave=chave)
+    obj = Solicitacao(
+        pessoa=pessoa, descricao=descricao,
+        latitude=latitude, longitude=longitude, imagens=json.dumps(imagens)
+    )
+    obj.save()
+    return HttpResponse(obj.uuid)

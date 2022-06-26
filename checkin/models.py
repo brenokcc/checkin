@@ -28,13 +28,15 @@ class Aplicacao(models.Model):
 
     token_autenticacao = models.CharField(verbose_name='Token de Autenticação', null=True, blank=True)
     url_envio_dados = models.URLField(verbose_name='URL de Envio de Dados', null=True, blank=True)
-    url_recebimento_dados = models.URLField(verbose_name='URL de Envio de Dados', null=True, blank=True)
+    url_recebimento_dados = models.URLField(verbose_name='URL de Recebimento de Dados', null=True, blank=True)
     intervalo_envio_dados = models.IntegerField(verbose_name='Intervalo de Envio dos Dados', help_text='Tempo em minutos no qual os dados serão enviados para a aplicação.', default=60)
     intervalo_recebimento_dados = models.IntegerField(verbose_name='Intervalo de Recebimento dos Dados', help_text='Tempo em minutos no qual os dados serão recebidos da a aplicação.', default=1440)
 
     objects = AplicacaoManager()
 
     def save(self, *args, **kwargs):
+        if not self.token_autenticacao:
+            self.token_autenticacao = uuid.uuid1().hex
         super().save(*args, **kwargs)
         if not self.pontocheckin_set.exists():
             PontoCheckin(aplicacao=self, nome=self.nome).save()
@@ -44,7 +46,8 @@ class Aplicacao(models.Model):
         verbose_name = 'Aplicação'
         verbose_name_plural = 'Aplicações'
         fieldsets = {
-            'Dados Gerais': ('nome', 'logo')
+            'Dados Gerais': ('nome', 'logo'),
+            'Integração': (('url_envio_dados', 'url_recebimento_dados'), ('intervalo_envio_dados', 'intervalo_recebimento_dados'))
         }
 
     def __str__(self):
@@ -55,7 +58,7 @@ class Aplicacao(models.Model):
         return self.pontocheckin_set.count()
 
     def get_dados_gerais(self):
-        return self.values(('nome')).image('logo')
+        return self.values('nome', 'token_autenticacao').image('logo')
 
     def get_dados_sincronizacao(self):
         return self.values('url_envio_dados', 'url_envio_dados', ('intervalo_envio_dados', 'intervalo_recebimento_dados'))
@@ -355,7 +358,6 @@ class Solicitacao(models.Model):
             imagens[descricao] = dados[descricao][23:]
         self.imagens = json.dumps(imagens)
         self.data_hora_termino = datetime.datetime.now()
-        self.save()
 
     def get_descricoes_imagens(self):
         return json.loads(self.imagens).keys()
@@ -364,6 +366,16 @@ class Solicitacao(models.Model):
         self.data_hora_inicio = None
         self.data_hora_termino = None
         self.save()
+
+    def enviar_dados(self):
+        url = self.pessoa.aplicacao.url_envio_dados
+        dados = dict(uuid=self.uuid)
+        for k, v in json.loads(self.imagens).items():
+            dados[k] = v
+        response = requests.post(url, dados)
+        if response.status_code == 200:
+            return True, response.text
+        return False, 'Erro ao enviar os dados.'
 
     def get_dados_gerais(self):
         return self.values('uuid', 'pessoa', ('latitude', 'longitude'), ('data_hora_inicio', 'data_hora_termino'))

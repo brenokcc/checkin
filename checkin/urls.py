@@ -8,6 +8,7 @@ urlpatterns = [
     path('checkin/<str:tipo>/<str:token>/', views.checkin),
     path('end/<str:uuid>/', views.end),
     path('upload/<str:uuid>/', views.upload),
+    path('solicitar/', views.solicitar),
     path('', include('sloth.api.urls')),
     path('', include('sloth.app.urls')),
 ]

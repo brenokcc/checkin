@@ -47,7 +47,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='aplicacao',
             name='url_recebimento_dados',
-            field=models.URLField(blank=True, null=True, verbose_name='URL de Envio de Dados'),
+            field=models.URLField(blank=True, null=True, verbose_name='URL de Recebimento de Dados'),
         ),
         migrations.AddField(
             model_name='checkin',
