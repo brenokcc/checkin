@@ -22,7 +22,7 @@ class AplicacaoManager(models.Manager):
 
 
 class Aplicacao(models.Model):
-    usuario = models.CurrentUserField(verbose_name='Usuário')
+    usuario = models.CurrentUserField(verbose_name='Usuário', null=True)
     logo = models.ImageField(verbose_name='Logo', null=True, blank=True)
     nome = models.CharField(verbose_name='Nome')
 
@@ -46,7 +46,7 @@ class Aplicacao(models.Model):
         verbose_name = 'Aplicação'
         verbose_name_plural = 'Aplicações'
         fieldsets = {
-            'Dados Gerais': ('nome', 'logo'),
+            'Dados Gerais': ('user', 'nome', 'logo'),
             'Integração': (('url_envio_dados', 'url_recebimento_dados'), ('intervalo_envio_dados', 'intervalo_recebimento_dados'))
         }
 
