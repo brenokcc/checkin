@@ -46,7 +46,7 @@ class Aplicacao(models.Model):
         verbose_name = 'Aplicação'
         verbose_name_plural = 'Aplicações'
         fieldsets = {
-            'Dados Gerais': ('user', 'nome', 'logo'),
+            'Dados Gerais': ('usuario', 'nome', 'logo'),
             'Integração': (('url_envio_dados', 'url_recebimento_dados'), ('intervalo_envio_dados', 'intervalo_recebimento_dados'))
         }
 
